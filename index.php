@@ -2,6 +2,6 @@
 
 session_start();
 
-echo "bonjour <br />";
 
-echo $_SESSION["cart"];;
+require "functions.php";
+require "router.php";
