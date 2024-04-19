@@ -24,15 +24,16 @@ class Validator {
    }
 
    public static function password($value) {
+      // Define validation criteria
       $minLength = 8;
       $maxLength = 20;
-
-
-      return preg_match('/[A-Z]/', $value) &&      // Check for uppercase letters
-           preg_match('/[a-z]/', $value) &&      // Check for lowercase letters
-           preg_match('/[0-9]/', $value) &&      // Check for digits
-           preg_match('/[^a-zA-Z0-9]/', $value);  // Check for special characters
-   }
-
-
+      
+      // Check if password meets all criteria
+      return strlen($value) >= $minLength && 
+            strlen($value) <= $maxLength &&
+            preg_match('/[A-Z]/', $value) &&
+            preg_match('/[a-z]/', $value) &&
+            preg_match('/\d/', $value) &&
+            preg_match('/[^a-zA-Z0-9]/', $value);
+      }
 }

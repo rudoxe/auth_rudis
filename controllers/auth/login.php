@@ -1,28 +1,33 @@
 <?php
 
+
+
+
 $title = "Login";
 
+// 1. Visu nokopēt no register
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    require "Validator.php";
-    require "Database.php";
-    $config = require "config.php";
-    $db = new Database($config);
+  // Include DB, Validator
+  require "Core/Validator.php";
+  require "Core/Database.php";
+  $config = require "config.php";
+  $db = new Database($config);
+  $errors = [];
 
-    $errors = [];
+  $query = "SELECT * FROM users 
+            WHERE email = :email";
+  $params = [
+    ":email" => $_POST["email"]
+  ];
+  $user = $db->execute($query, $params)->fetch();
+  if ($user && password_verify($_POST["password"], $user["PASSWORD"])) {
+    $_SESSION["user"] = $user["email"];
+    header("Location: /");
+    exit();
+  } else {
+    $errors["email"] = "Invalid email or password";
+  }
 
-    $query = "SELECT * FROM users WHERE email = :email";
-    $params = [
-        ":email" => $_POST["email"]
-    ];
-
-    $user = $db->execute($query, $params)->fetch();
-    if (!$user && password_verify($_POST["password"], $user["password"])) {
-
-    } else {
-        $errors["email"] = "Invalid email or password";
-    }
-
-    dd($user);
 }
-
-require "views/auth/login.view.php";
+require "../views/auth/login.view.php";

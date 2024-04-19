@@ -2,11 +2,13 @@
 
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-  require "Validator.php";
-  require "Database.php";
+  // Include DB, Validator
+  require "Core/Validator.php";
+  require "Core/Database.php";
   $config = require "config.php";
   $db = new Database($config);
 
+  // Trim, validēt datus
   $errors = [];
 
   if (!Validator::email($_POST["email"])) {
@@ -14,7 +16,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   }
 
   if (!Validator::password($_POST["password"])) {
-    $errors["password"] = "Password too short";
+    $errors["password"] = "Password is invalid";
   }
 
   $query = "SELECT * FROM users WHERE email = :email";
@@ -22,27 +24,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   $user = $db->execute($query, $params)->fetch();
 
   if ($user) {
-    $errors["email"] = "email already in use";
+    $errors["email"] = "e-mail already in use";
   }
 
+
+  // Saglabāsim DB, izmantojot bind params, ar:
   if (empty($errors)) {
-
-  $query = "INSERT INTO users (email, password)
-  VALUES (:email, :password)";
-  $sql_params = [
-    ":email" => $_POST["email"],
-    ":password" => password_hash($_POST["password"], PASSWORD_BCRYPT)
-  ];
-  $db->execute($query, $sql_params);
-  header("Location: /login");
-  die();
-
-
-  $_POST["email"];
-  $_POST["password"];
+    $query = "INSERT INTO users (email, password)
+              VALUES (:email, :password)";
+    $sql_params = [
+      ":email" => $_POST["email"],
+      ":password" => password_hash($_POST["password"], PASSWORD_BCRYPT)
+    ];
+    $db->execute($query, $sql_params);
+    header("Location: /login");
+    die();
   }
 }
 
 
 $title = "Register";
-require "views/auth/register.view.php";
+require "../views/auth/register.view.php";
